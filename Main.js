@@ -5,8 +5,7 @@
 // @version      0.9
 // @description  Modifies the Gulfstream website in various ways to provide a better user interface
 // @author       Kalbintion
-// @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream
-// @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream/
+// @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream*
 // @grant        none
 // @icon         https://gulfstream.fidlar.com/Content/Images/favicon.ico
 // @icon64       https://gulfstream.fidlar.com/Content/Images/favicon.ico
@@ -31,6 +30,11 @@ var KEY_UNDO = -1; // Undo button (black toolbar, <)
 var KEY_REDO = -1; // Redo button (black toolbar, >)
 var KEY_CCW_ROTATE = -1; // Counter-clockwise rotate (black toolbar, < circle)
 var KEY_CW_ROTATE = -1; // Clockwise rotate (black toolbar, > circle)
+var KEY_AUTO_SCROLL = 110; // Auto-scrolling feature
+
+// Auto-scroll settings
+var SCROLL_SPEED = 10;
+var SCROLL_AMOUNT = 4;
 
 // Module enable/disable
 var allowImageLocModification = true; // This module tries to modify the image on the screen to its original
@@ -42,6 +46,7 @@ var allowTimer = true; // This module adds a timer to the upper left of the page
 // ==========================================================================================================
 document.body.addEventListener("keydown", keyDownTextField, false);
 function keyDownTextField(e) {
+  console.log(e.keyCode);
   var code = e.keyCode;
   switch ( code )
   {
@@ -83,6 +88,10 @@ function keyDownTextField(e) {
       break;
     case KEY_CW_ROTATE:
       document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[1].click();
+      break;
+    case KEY_AUTO_SCROLL:
+      document.getElementById("autoScroll_chk").checked = !document.getElementById("autoScroll_chk").checked;
+      updateAutoScrollSetting();
       break;
     default:
       break;
@@ -150,11 +159,6 @@ inputLoginTimer.style.padding = "1px 5px";
 inputLoginTimer.style.width = "100px";
 divLoginTimer.innerHTML = "Timer: ";
 divLoginTimer.appendChild(inputLoginTimer);
-
-// div location reset on resize
-window.addEventListener("resize", function(e) {
-    divLoginTimer.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 22 + "px";
-});
 
 // Reset Button
 var inputResetButton = document.createElement("input");
@@ -236,27 +240,55 @@ function timeReset() {
     }
 }
 
-// Keeps track of time spent logged in
-/* setInterval(addSecond, 1000, inputLoginTimer);
+// ==========================================================================================================
+// Auto-scroll Document
+// ==========================================================================================================
+// Container object
+var divAutoScroll = document.createElement("div");
+divAutoScroll.id = "autoScroll_div";
+divAutoScroll.style.color = "#FFF";
+divAutoScroll.style.position = "absolute";
+divAutoScroll.style.left = "25px";
+divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 82 + "px";
 
-function addSecond(obj) {
-    time+=1;
-    setCookie("time", time);
-    var sec = time % 60;
-    var min = Math.floor(time / 60) % 60;
-    var hr = Math.floor(time / 60 / 60);
-    obj.value = hr + "h " + min + "m " + sec + "s";
-    obj.title = time + "s";
+// Label
+var lblAutoScroll = document.createElement("label");
+lblAutoScroll.id="autoScroll_lbl";
+lblAutoScroll.htmlFor="autoScroll_chk";
+lblAutoScroll.innerHTML="Auto-Scroll";
+
+// Checkbox
+var chkAutoScroll = document.createElement("input");
+chkAutoScroll.type = "checkbox";
+chkAutoScroll.id = "autoScroll_chk";
+chkAutoScroll.onchange = updateAutoScrollSetting;
+chkAutoScroll.checked = Boolean(getCookieValueDef("autoScroll", "").replace("false", ""));
+
+divAutoScroll.appendChild(chkAutoScroll);
+divAutoScroll.appendChild(lblAutoScroll);
+
+document.body.appendChild(divAutoScroll);
+
+setInterval(scrollDocument, SCROLL_SPEED);
+
+function scrollDocument() {
+    if(document.getElementById("autoScroll_chk").checked) {
+        document.getElementById("imageWrapper").scrollTop += SCROLL_AMOUNT;
+    }
 }
 
-function resetTime() {
-    var res = confirm("Do you wish to reset the time?");
-    if(res === true) {
-        time=0;
-        setCookie("time", time);
-    }
-} */
+function updateAutoScrollSetting() {
+    console.log("autoScroll = " + document.getElementById("autoScroll_chk").checked);
+    setCookie("autoScroll", document.getElementById("autoScroll_chk").checked);
+}
 
+// timer & auto-scroll div location reset on resize
+window.addEventListener("resize", function(e) {
+    divLoginTimer.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 22 + "px";
+    divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 82 + "px";
+});
+
+    
 // ==========================================================================================================
 // Cookie Functions
 function getCookie(name) { return getCookieValue(name); }
@@ -269,6 +301,11 @@ function getCookieValue(name) {
             return pairs[1];
     }
     return null;
+}
+
+function getCookieValueDef(name, defaultValue) {
+    var res = getCookieValue(name);
+    if(res === null) { return defaultValue; } else { return res; }
 }
 
 function setCookie(name, value) {
