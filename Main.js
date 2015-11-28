@@ -1,4 +1,5 @@
 // ==UserScript==
+// @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Main.js
 // @name         Gulf Stream Modifications
 // @namespace    https://gulfstream.fidlar.com
 // @version      0.9

@@ -1,4 +1,5 @@
 // ==UserScript==
+// @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Productivity.js
 // @name         Gulf Stream Modifications - Productivity
 // @namespace    https://gulfstream.fidlar.com
 // @version      0.2
