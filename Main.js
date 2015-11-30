@@ -2,7 +2,7 @@
 // @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Main.js
 // @name         Gulf Stream Modifications
 // @namespace    https://gulfstream.fidlar.com
-// @version      0.11
+// @version      0.12
 // @description  Modifies the Gulfstream website in various ways to provide a better user interface
 // @author       Kalbintion
 // @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream*
@@ -17,8 +17,8 @@
 // ==========================================================================================================
 // For Keycodes see http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 // Use -1 to disable
-var KEY_LAST_DOCUMENT = -1; // Goes to the previous document
-var KEY_NEXT_DOCUMENT = -1; // Goes to the next document
+var KEY_LAST_DOCUMENT = 37; // Goes to the previous document
+var KEY_NEXT_DOCUMENT = 39; // Goes to the next document
 var KEY_ADD_PAGE = 107; // Adds page to document
 var KEY_NEXT_DOCUMENT_FOCUS = -1; // Focuses input onto Document name textbox
 var KEY_PAGE_NUMBER_FOCUS = -1; // Focuses input onto page number textbox
@@ -46,56 +46,56 @@ var allowTimer = true; // This module adds a timer to the upper left of the page
 // ==========================================================================================================
 document.body.addEventListener("keydown", keyDownTextField, false);
 function keyDownTextField(e) {
-  // console.log(e.keyCode);
-  var code = e.keyCode;
-  switch ( code )
-  {
-    case KEY_LAST_DOCUMENT:
-      document.getElementById("MainContent_DefaultMainContent_lbLastDocument").click();
-      break;
-    case KEY_NEXT_DOCUMENT:
-      document.getElementById("MainContent_DefaultMainContent_lbNextDocument").click();
-      break;
-    case KEY_ADD_PAGE:
-      document.getElementById("MainContent_DefaultMainContent_RadButtonAddPage").click();
-      break;
-    case KEY_NEXT_DOCUMENT_FOCUS:
-      document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument").focus();
-      break;
-    case KEY_PAGE_NUMBER_FOCUS:
-      document.getElementById("MainContent_DefaultMainContent_CurrentPageNumber").focus();
-      break;
-    case KEY_RENAME_YES:
-      document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonYes").click();
-      break;
-    case KEY_RENAME_NO:
-      document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonNo").click();
-      break;
-    case KEY_MULTI_DOC:
-      document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.lastChild.click();
-      break;
-    case KEY_BLANK_PAGE:
-      document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[2].click();
-      break;
-    case KEY_UNDO:
-      document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[0].click();
-      break;
-    case KEY_REDO:
-      document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[1].click();
-      break;
-    case KEY_CCW_ROTATE:
-      document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[0].click();
-      break;
-    case KEY_CW_ROTATE:
-      document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[1].click();
-      break;
-    case KEY_AUTO_SCROLL:
-      document.getElementById("autoScroll_chk").checked = !document.getElementById("autoScroll_chk").checked;
-      updateAutoScrollSetting();
-      break;
-    default:
-      break;
-  }
+    // console.log(e.keyCode);
+    var code = e.keyCode;
+    switch ( code )
+    {
+        case KEY_LAST_DOCUMENT:
+            document.getElementById("MainContent_DefaultMainContent_lbLastDocument").click();
+            break;
+        case KEY_NEXT_DOCUMENT:
+            document.getElementById("MainContent_DefaultMainContent_lbNextDocument").click();
+            break;
+        case KEY_ADD_PAGE:
+            document.getElementById("MainContent_DefaultMainContent_RadButtonAddPage").click();
+            break;
+        case KEY_NEXT_DOCUMENT_FOCUS:
+            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument").focus();
+            break;
+        case KEY_PAGE_NUMBER_FOCUS:
+            document.getElementById("MainContent_DefaultMainContent_CurrentPageNumber").focus();
+            break;
+        case KEY_RENAME_YES:
+            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonYes").click();
+            break;
+        case KEY_RENAME_NO:
+            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonNo").click();
+            break;
+        case KEY_MULTI_DOC:
+            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.lastChild.click();
+            break;
+        case KEY_BLANK_PAGE:
+            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[2].click();
+            break;
+        case KEY_UNDO:
+            document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[0].click();
+            break;
+        case KEY_REDO:
+            document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[1].click();
+            break;
+        case KEY_CCW_ROTATE:
+            document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[0].click();
+            break;
+        case KEY_CW_ROTATE:
+            document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[1].click();
+            break;
+        case KEY_AUTO_SCROLL:
+            document.getElementById("autoScroll_chk").checked = !document.getElementById("autoScroll_chk").checked;
+            updateAutoScrollSetting();
+            break;
+        default:
+            break;
+    }
 }
 
 // ==========================================================================================================
@@ -123,17 +123,17 @@ function ModifyImageLink() {
 // ==========================================================================================================
 var multidocTimer = setInterval(ModifyMultidoc, 250);
 function ModifyMultidoc() {
-   var obj = document.getElementById("RadWindowWrapper_ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages");
-   if(obj === null) {
-       // clearInterval(multidocTimer);
-       return;
-   } else {
-       var parentGroup = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C").children[0];
-       var buttonGroup = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C").children[0].lastElementChild;
-       if(~buttonGroup.innerHTML.indexOf("button")) {
-           parentGroup.insertBefore(buttonGroup, document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C").children[0].children[0]);
-       }
-   }
+    var obj = document.getElementById("RadWindowWrapper_ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages");
+    if(obj === null) {
+        // clearInterval(multidocTimer);
+        return;
+    } else {
+        var parentGroup = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C").children[0];
+        var buttonGroup = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C").children[0].lastElementChild;
+        if(~buttonGroup.innerHTML.indexOf("button")) {
+            parentGroup.insertBefore(buttonGroup, document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C").children[0].children[0]);
+        }
+    }
 }
 
 // ==========================================================================================================
@@ -176,59 +176,59 @@ divLoginTimer.appendChild(inputResetButton);
 document.body.appendChild(divLoginTimer);
 // onbeforeunload Event
 window.addEventListener("beforeunload", function(e){
-   setCookie("unloadTime", Date());
+    setCookie("unloadTime", Date());
 }, false);
 
 // Initiate the tracker
 timeTrackerInit();
 
 function timeTrackerInit() {
-   if(getCookieValue("startTime") !== null) {
-      // We have a startTime from before - do the difference on the dates and push it to logged time
-      var startDate = new Date(getCookieValue("startTime"));
-      var tickDate = new Date(getCookieValue("tickTime"));
-      setCookie("time", Number(getCookieValue("time")) + getTimeDifference(startDate, tickDate));
-   }
-    
-   // Page Load Check (Continuation)
-   if(getCookieValue("unloadTime") !== null && getCookieValue("unloadTime") !== "") {
-       var pageLoadTime = getTimeDifference(new Date(getCookieValue("unloadTime")), Date());
-       console.log("pageLoadTime: " + pageLoadTime);
-       if(pageLoadTime <= 10000) { // Only triggers if it has been less than 10 seconds
-           setCookie("time", Number(getCookieValue("time")) + pageLoadTime);
-           setCookie("unloadTime", null);
-       }
-   }
-   
-   // Reset both tickTime and startTime to now after calculations have been completed
-   setCookie("startTime", Date());
-   setCookie("tickTime", Date());
-    
-   // Initiate the timer
-   setInterval(timeUpdate, 1000, inputLoginTimer);
-    
-   // Update display immediately
-   timeUpdateDisplay(inputLoginTimer);
+    if(getCookieValue("startTime") !== null) {
+        // We have a startTime from before - do the difference on the dates and push it to logged time
+        var startDate = new Date(getCookieValue("startTime"));
+        var tickDate = new Date(getCookieValue("tickTime"));
+        setCookie("time", Number(getCookieValue("time")) + getTimeDifference(startDate, tickDate));
+    }
+
+    // Page Load Check (Continuation)
+    if(getCookieValue("unloadTime") !== null && getCookieValue("unloadTime") !== "") {
+        var pageLoadTime = getTimeDifference(new Date(getCookieValue("unloadTime")), Date());
+        console.log("pageLoadTime: " + pageLoadTime);
+        if(pageLoadTime <= 10000) { // Only triggers if it has been less than 10 seconds
+            setCookie("time", Number(getCookieValue("time")) + pageLoadTime);
+            setCookie("unloadTime", null);
+        }
+    }
+
+    // Reset both tickTime and startTime to now after calculations have been completed
+    setCookie("startTime", Date());
+    setCookie("tickTime", Date());
+
+    // Initiate the timer
+    setInterval(timeUpdate, 1000, inputLoginTimer);
+
+    // Update display immediately
+    timeUpdateDisplay(inputLoginTimer);
 }
 
 function timeUpdateDisplay(obj) {
-   // Existing + Unaccounted marked time
-   var milliseconds = (Number(getCookieValue("time")) + Number(getTimeDifference(getCookie("startTime"), getCookie("tickTime")))) / 1000;
-   var sec = Math.floor(milliseconds) % 60;
-   var min = Math.floor(milliseconds / 60) % 60;
-   var hr = Math.floor(milliseconds / 60 / 60);
-    
-   obj.value = hr + "h " + min + "m " + sec + "s";
-   obj.title = milliseconds + "s";
+    // Existing + Unaccounted marked time
+    var milliseconds = (Number(getCookieValue("time")) + Number(getTimeDifference(getCookie("startTime"), getCookie("tickTime")))) / 1000;
+    var sec = Math.floor(milliseconds) % 60;
+    var min = Math.floor(milliseconds / 60) % 60;
+    var hr = Math.floor(milliseconds / 60 / 60);
+
+    obj.value = hr + "h " + min + "m " + sec + "s";
+    obj.title = milliseconds + "s";
 }
 
 function timeUpdate(obj) {
-   setCookie("tickTime", Date());
-   timeUpdateDisplay(obj);
+    setCookie("tickTime", Date());
+    timeUpdateDisplay(obj);
 }
 
 function getTimeDifference(date1, date2) {
-   return new Date(date2).getTime() - new Date(date1).getTime();   
+    return new Date(date2).getTime() - new Date(date1).getTime();   
 }
 
 function timeReset() {
@@ -254,9 +254,13 @@ function prefixTextfield(e) {
                 count++;
             }
         }
-        
+
         // console.log("0".repeat(count) + input.value);
-        input.value = "0".repeat(count) + input.value.replace("_", "");
+        var res = Number(input.value.replace("_", ""));
+
+        // Predictability
+        var lastPageNumber = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadGridDocuments_ctl00").children[2].children[0].children[1].innerHTML;
+        input.value = "0".repeat(count) + (res + Number(lastPageNumber) - 1);
     }
 }
 
@@ -308,7 +312,7 @@ window.addEventListener("resize", function(e) {
     divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 82 + "px";
 });
 
-    
+
 // ==========================================================================================================
 // Cookie Functions
 function getCookie(name) { return getCookieValue(name); }
