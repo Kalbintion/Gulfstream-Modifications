@@ -2,7 +2,7 @@
 // @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Main.js
 // @name         Gulf Stream Modifications
 // @namespace    https://gulfstream.fidlar.com
-// @version      0.10
+// @version      0.11
 // @description  Modifies the Gulfstream website in various ways to provide a better user interface
 // @author       Kalbintion
 // @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream*
@@ -17,8 +17,8 @@
 // ==========================================================================================================
 // For Keycodes see http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 // Use -1 to disable
-var KEY_LAST_DOCUMENT = 37; // Goes to the previous document
-var KEY_NEXT_DOCUMENT = 39; // Goes to the next document
+var KEY_LAST_DOCUMENT = -1; // Goes to the previous document
+var KEY_NEXT_DOCUMENT = -1; // Goes to the next document
 var KEY_ADD_PAGE = 107; // Adds page to document
 var KEY_NEXT_DOCUMENT_FOCUS = -1; // Focuses input onto Document name textbox
 var KEY_PAGE_NUMBER_FOCUS = -1; // Focuses input onto page number textbox
@@ -34,7 +34,7 @@ var KEY_AUTO_SCROLL = 110; // Auto-scrolling feature
 
 // Auto-scroll settings
 var SCROLL_SPEED = 10;
-var SCROLL_AMOUNT = 4;
+var SCROLL_AMOUNT = 6;
 
 // Module enable/disable
 var allowImageLocModification = true; // This module tries to modify the image on the screen to its original
@@ -46,7 +46,7 @@ var allowTimer = true; // This module adds a timer to the upper left of the page
 // ==========================================================================================================
 document.body.addEventListener("keydown", keyDownTextField, false);
 function keyDownTextField(e) {
-  console.log(e.keyCode);
+  // console.log(e.keyCode);
   var code = e.keyCode;
   switch ( code )
   {
@@ -237,6 +237,26 @@ function timeReset() {
         setCookie("time", "0");
         setCookie("startTime", Date());
         setCookie("tickTime", Date());
+    }
+}
+
+// ==========================================================================================================
+// Digit Prefix
+// ==========================================================================================================
+document.getElementsByClassName("container-fluid")[0].addEventListener("DOMSubtreeModified", prefixTextfield);
+
+function prefixTextfield(e) {
+    if(e.srcElement.id == "imageWrapper") {
+        var input = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument");
+        var count = 0;
+        for(var i =0; i < input.value.length; i++) {
+            if(input.value.charAt(i) == "_") {
+                count++;
+            }
+        }
+        
+        // console.log("0".repeat(count) + input.value);
+        input.value = "0".repeat(count) + input.value.replace("_", "");
     }
 }
 
