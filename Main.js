@@ -17,8 +17,8 @@
 // ==========================================================================================================
 // For Keycodes see http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
 // Use -1 to disable
-var KEY_LAST_DOCUMENT = 37; // Goes to the previous document
-var KEY_NEXT_DOCUMENT = 39; // Goes to the next document
+var KEY_LAST_DOCUMENT = -1; // Goes to the previous document
+var KEY_NEXT_DOCUMENT = -1; // Goes to the next document
 var KEY_ADD_PAGE = 107; // Adds page to document
 var KEY_NEXT_DOCUMENT_FOCUS = -1; // Focuses input onto Document name textbox
 var KEY_PAGE_NUMBER_FOCUS = -1; // Focuses input onto page number textbox
