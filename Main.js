@@ -2,7 +2,7 @@
 // @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Main.js
 // @name         Gulf Stream Modifications
 // @namespace    https://gulfstream.fidlar.com
-// @version      0.12
+// @version      0.13
 // @description  Modifies the Gulfstream website in various ways to provide a better user interface
 // @author       Kalbintion
 // @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream*
@@ -241,30 +241,6 @@ function timeReset() {
 }
 
 // ==========================================================================================================
-// Digit Prefix
-// ==========================================================================================================
-document.getElementsByClassName("container-fluid")[0].addEventListener("DOMSubtreeModified", prefixTextfield);
-
-function prefixTextfield(e) {
-    if(e.srcElement.id == "imageWrapper") {
-        var input = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument");
-        var count = 0;
-        for(var i =0; i < input.value.length; i++) {
-            if(input.value.charAt(i) == "_") {
-                count++;
-            }
-        }
-
-        // console.log("0".repeat(count) + input.value);
-        var res = Number(input.value.replace("_", ""));
-
-        // Predictability
-        var lastPageNumber = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadGridDocuments_ctl00").children[2].children[0].children[1].innerHTML;
-        input.value = "0".repeat(count) + (res + Number(lastPageNumber) - 1);
-    }
-}
-
-// ==========================================================================================================
 // Auto-scroll Document
 // ==========================================================================================================
 // Container object
@@ -312,9 +288,36 @@ window.addEventListener("resize", function(e) {
     divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 82 + "px";
 });
 
+// ==========================================================================================================
+// Digit Prefix
+// ==========================================================================================================
+document.getElementsByClassName("container-fluid")[0].addEventListener("DOMSubtreeModified", prefixTextfield);
+// Trigger function once on page loads, requires srcElement.id=imageWrapper
+prefixTextfield({srcElement:{id:"imageWrapper"}});
+
+function prefixTextfield(e) {
+    console.log(e);
+    if(e.srcElement.id == "imageWrapper") {
+        var input = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument");
+        var count = 0;
+        for(var i =0; i < input.value.length; i++) {
+            if(input.value.charAt(i) == "_") {
+                count++;
+            }
+        }
+
+        // console.log("0".repeat(count) + input.value);
+        var res = Number(input.value.replace("_", ""));
+
+        // Predictability
+        var lastPageNumber = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadGridDocuments_ctl00").children[2].children[0].children[1].innerHTML;
+        input.value = "0".repeat(count) + (res + Number(lastPageNumber) - 1);
+    }
+}
 
 // ==========================================================================================================
 // Cookie Functions
+// ==========================================================================================================
 function getCookie(name) { return getCookieValue(name); }
 
 function getCookieValue(name) {
