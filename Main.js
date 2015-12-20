@@ -2,7 +2,7 @@
 // @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Main.js
 // @name         Gulf Stream Modifications
 // @namespace    https://gulfstream.fidlar.com
-// @version      0.14
+// @version      0.16
 // @description  Modifies the Gulfstream website in various ways to provide a better user interface
 // @author       Kalbintion
 // @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream*
@@ -15,106 +15,134 @@
 // ==========================================================================================================
 // Settings
 // ==========================================================================================================
-// For Keycodes see http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
-// Use -1 to disable
-var KEY_LAST_DOCUMENT = -1; // Goes to the previous document
-var KEY_NEXT_DOCUMENT = -1; // Goes to the next document
-var KEY_ADD_PAGE = 107; // Adds page to document
-var KEY_NEXT_DOCUMENT_FOCUS = -1; // Focuses input onto Document name textbox
-var KEY_PAGE_NUMBER_FOCUS = -1; // Focuses input onto page number textbox
-var KEY_RENAME_YES = -1; // "Yes" on the rename dialog
-var KEY_RENAME_NO = -1; // "No" on the rename dialog
-var KEY_MULTI_DOC = 106; // Brings up the multiple document window
-var KEY_BLANK_PAGE = 111; // Marks page as blank
-var KEY_UNDO = -1; // Undo button (black toolbar, <)
-var KEY_REDO = -1; // Redo button (black toolbar, >)
-var KEY_CCW_ROTATE = -1; // Counter-clockwise rotate (black toolbar, < circle)
-var KEY_CW_ROTATE = -1; // Clockwise rotate (black toolbar, > circle)
-var KEY_AUTO_SCROLL = 110; // Auto-scrolling feature
-
-// Auto-scroll settings
-var SCROLL_SPEED = 10;
-var SCROLL_AMOUNT = 6;
-
-// Module enable/disable
-var allowImageLocModification = true; // This module tries to modify the image on the screen to its original
-var allowTimer = true; // This module adds a timer to the upper left of the page area indicating log in time
-
+var GS_SETTINGS = {
+// MODULE: Shortcut Keys
+    ShortcutKeys: { // This module adds custom shortcut keys to the system.
+        Enabled: true, 
+        
+        // For Keycodes see http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+        // Use -1 to disable
+        PrevDocument: 37, // Goes to the previous document
+        NextDocument: 39, // Goes to the next document
+        AddPage: 107, // Adds page to document
+        NextDocumentFocus: -1,  // Focuses input onto Document name textbox
+        PageNumberFocus: -1, // Focuses input onto page number textbox
+        RenameYes: -1, // "Yes" on the rename dialog
+        RenameNo: -1, // "No" on the rename dialog
+        MultiDoc: 106, // Brings up the multiple document window
+        BlankPage: 111, // Marks page as blank
+        Undo: -1, // Undo button (black toolbar, <)
+        Redo: -1, // Redo button (black toolbar, >)
+        RotateCCW: -1, // Counter-clockwise rotate (black toolbar, < circle)
+        RotateCW: -1, // Clockwise rotate (black toolbar, > circle)
+        DupePage: 109, // Duplicate page
+        AutoScroll: 110, // Auto-scrolling feature, see MODULE: Auto-Scroll
+    },
+// MODULE: Login Timer
+    LoginTimer: { // This module adds a timer to the top left of the document area keeping track of login time
+        Enabled:true,
+    },
+// MODULE: Auto-Scroll
+    AutoScroll: { // This module adds a checkbox to automatically scroll the document window
+        Enabled:true,
+        
+        ScrollSpeed:10,
+        ScrollAmount:6,
+    },
+// MODULE: Alternate Scroll
+    AlternateScroll: { // This module will alternate the document area to the opposite side of every other document page
+        Enabled:true,
+        
+        OddOrEven:"odd", // Whether to alternate the side the document is on on odd or even based page numbers
+    },
+// MODULE: Modify Image Source
+    ImageSourceMods: {// This module tries to modify the image on the screen to its original
+        Enabled: false,
+    },
+// MODULE: Digit Prediction
+    DigitPrediction: { // This module predicts the next page document number and prefixes the name with zero's
+        Enabled: false,
+    },
+};
 
 // ==========================================================================================================
 // Key Shortcuts
 // ==========================================================================================================
-document.body.addEventListener("keydown", keyDownTextField, false);
-function keyDownTextField(e) {
-    // console.log(e.keyCode);
-    var code = e.keyCode;
-    switch ( code )
-    {
-        case KEY_LAST_DOCUMENT:
-            document.getElementById("MainContent_DefaultMainContent_lbLastDocument").click();
-            break;
-        case KEY_NEXT_DOCUMENT:
-            document.getElementById("MainContent_DefaultMainContent_lbNextDocument").click();
-            break;
-        case KEY_ADD_PAGE:
-            document.getElementById("MainContent_DefaultMainContent_RadButtonAddPage").click();
-            break;
-        case KEY_NEXT_DOCUMENT_FOCUS:
-            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument").focus();
-            break;
-        case KEY_PAGE_NUMBER_FOCUS:
-            document.getElementById("MainContent_DefaultMainContent_CurrentPageNumber").focus();
-            break;
-        case KEY_RENAME_YES:
-            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonYes").click();
-            break;
-        case KEY_RENAME_NO:
-            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonNo").click();
-            break;
-        case KEY_MULTI_DOC:
-            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.lastChild.click();
-            break;
-        case KEY_BLANK_PAGE:
-            document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[2].click();
-            break;
-        case KEY_UNDO:
-            document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[0].click();
-            break;
-        case KEY_REDO:
-            document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[1].click();
-            break;
-        case KEY_CCW_ROTATE:
-            document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[0].click();
-            break;
-        case KEY_CW_ROTATE:
-            document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[1].click();
-            break;
-        case KEY_AUTO_SCROLL:
-            document.getElementById("autoScroll_chk").checked = !document.getElementById("autoScroll_chk").checked;
-            updateAutoScrollSetting();
-            break;
-        default:
-            break;
+if (GS_SETTINGS["ShortcutKeys"]["Enabled"]) {
+    document.body.addEventListener("keydown", keyDownTextField, false);
+    function keyDownTextField(e) {
+        // console.log(e.keyCode);
+        var code = e.keyCode;
+        switch ( code )
+        {
+            case GS_SETTINGS["ShortcutKeys"]["PrevDocument"]:
+                document.getElementById("MainContent_DefaultMainContent_lbLastDocument").click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["NextDocument"]:
+                document.getElementById("MainContent_DefaultMainContent_lbNextDocument").click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["AddPage"]:
+                document.getElementById("MainContent_DefaultMainContent_RadButtonAddPage").click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["NextDocumentFocus"]:
+                document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument").focus();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["PageNumberFocus"]:
+                document.getElementById("MainContent_DefaultMainContent_CurrentPageNumber").focus();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["RenameYes"]:
+                document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonYes").click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["RenameNo"]:
+                document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonNo").click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["MultiDoc"]:
+                document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.lastChild.click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["BlankPage"]:
+                document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[2].click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["Undo"]:
+                document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[0].click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["Redo"]:
+                document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[1].click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["RotateCCW"]:
+                document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[0].click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["RotateCW"]:
+                document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[1].click();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["AutoScroll"]:
+                document.getElementById("autoScroll_chk").checked = !document.getElementById("autoScroll_chk").checked;
+                updateAutoScrollSetting();
+                break;
+            case GS_SETTINGS["ShortcutKeys"]["BlankPage"]:
+                document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[1].click();
+                break;
+            default:
+                break;
+        }
     }
 }
 
 // ==========================================================================================================
 // Modifies the image link to show original image
 // ==========================================================================================================
-var imageLinkTimer;
-if (allowImageLocModification) {
-    imageLinkTimer = setInterval(ModifyImageLink, 250);
-}
+if(GS_SETTINGS["ImageSourceMods"]["Enabled"]) {
+    var imageLinkTimer = setInterval(ModifyImageLink, 250);
 
-function ModifyImageLink() {
-    var obj = document.getElementById("documentImage");
-    if(obj === null) {
-        clearInterval(imageLinkTimer);
-        return;
-    } else if(obj.src.indexOf("index") != -1) {
-        obj.src = obj.src.replace("index?", "OriginalImage?");
-        obj.style.display = "";
-        obj.style.width = "1150px";
+    function ModifyImageLink() {
+        var obj = document.getElementById("documentImage");
+        if(obj === null) {
+            clearInterval(imageLinkTimer);
+            return;
+        } else if(obj.src.indexOf("index") != -1) {
+            obj.src = obj.src.replace("index?", "OriginalImage?");
+            obj.style.display = "";
+            obj.style.width = "1150px";
+        }
     }
 }
 
@@ -139,147 +167,151 @@ function ModifyMultidoc() {
 // ==========================================================================================================
 // Time Tracking System
 // ==========================================================================================================
-// Login Timer Div
-var divLoginTimer = document.createElement("div");
-divLoginTimer.id = "loginTimer_div";
-divLoginTimer.style.color = "#FFF";
-divLoginTimer.style.position = "absolute";
-divLoginTimer.style.left = "25px";
-divLoginTimer.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 22 + "px";
+if(GS_SETTINGS["LoginTimer"]["Enabled"]) {
+    // Login Timer Div
+    var divLoginTimer = document.createElement("div");
+    divLoginTimer.id = "loginTimer_div";
+    divLoginTimer.style.color = "#FFF";
+    divLoginTimer.style.position = "absolute";
+    divLoginTimer.style.left = "25px";
+    divLoginTimer.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 22 + "px";
 
-// Login Timer Input
-var inputLoginTimer = document.createElement("input");
-inputLoginTimer.id = "loginTimer";
-inputLoginTimer.disabled = "disabled";
-inputLoginTimer.value = "0h 0m 0s";
-inputLoginTimer.style.border = "1px solid black";
-inputLoginTimer.style.color = "#FFF";
-inputLoginTimer.style.backgroundColor = "#000";
-inputLoginTimer.style.padding = "1px 5px";
-inputLoginTimer.style.width = "100px";
-divLoginTimer.innerHTML = "Timer: ";
-divLoginTimer.appendChild(inputLoginTimer);
+    // Login Timer Input
+    var inputLoginTimer = document.createElement("input");
+    inputLoginTimer.id = "loginTimer";
+    inputLoginTimer.disabled = "disabled";
+    inputLoginTimer.value = "0h 0m 0s";
+    inputLoginTimer.style.border = "1px solid black";
+    inputLoginTimer.style.color = "#FFF";
+    inputLoginTimer.style.backgroundColor = "#000";
+    inputLoginTimer.style.padding = "1px 5px";
+    inputLoginTimer.style.width = "100px";
+    divLoginTimer.innerHTML = "Timer: ";
+    divLoginTimer.appendChild(inputLoginTimer);
 
-// Reset Button
-var inputResetButton = document.createElement("input");
-inputResetButton.id = "loginTimerReset";
-inputResetButton.type = "button";
-inputResetButton.onclick=timeReset;
-inputResetButton.value="Reset";
-inputResetButton.style.border = "1px solid black";
-inputResetButton.style.backgroundColor = "#000";
-inputResetButton.style.padding = "1px 5px";
-divLoginTimer.appendChild(document.createElement("br"));
-divLoginTimer.appendChild(inputResetButton);
+    // Reset Button
+    var inputResetButton = document.createElement("input");
+    inputResetButton.id = "loginTimerReset";
+    inputResetButton.type = "button";
+    inputResetButton.onclick=timeReset;
+    inputResetButton.value="Reset";
+    inputResetButton.style.border = "1px solid black";
+    inputResetButton.style.backgroundColor = "#000";
+    inputResetButton.style.padding = "1px 5px";
+    divLoginTimer.appendChild(document.createElement("br"));
+    divLoginTimer.appendChild(inputResetButton);
 
-// Append the timer to the page
-document.body.appendChild(divLoginTimer);
-// onbeforeunload Event
-window.addEventListener("beforeunload", function(e){
-    setCookie("unloadTime", Date());
-}, false);
+    // Append the timer to the page
+    document.body.appendChild(divLoginTimer);
+    // onbeforeunload Event
+    window.addEventListener("beforeunload", function(e){
+        setCookie("unloadTime", Date());
+    }, false);
 
-// Initiate the tracker
-timeTrackerInit();
+    // Initiate the tracker
+    timeTrackerInit();
 
-function timeTrackerInit() {
-    if(getCookieValue("startTime") !== null) {
-        // We have a startTime from before - do the difference on the dates and push it to logged time
-        var startDate = new Date(getCookieValue("startTime"));
-        var tickDate = new Date(getCookieValue("tickTime"));
-        setCookie("time", Number(getCookieValue("time")) + getTimeDifference(startDate, tickDate));
-    }
-
-    // Page Load Check (Continuation)
-    if(getCookieValue("unloadTime") !== null && getCookieValue("unloadTime") !== "") {
-        var pageLoadTime = getTimeDifference(new Date(getCookieValue("unloadTime")), Date());
-        console.log("pageLoadTime: " + pageLoadTime);
-        if(pageLoadTime <= 10000) { // Only triggers if it has been less than 10 seconds
-            setCookie("time", Number(getCookieValue("time")) + pageLoadTime);
-            setCookie("unloadTime", null);
+    function timeTrackerInit() {
+        if(getCookieValue("startTime") !== null) {
+            // We have a startTime from before - do the difference on the dates and push it to logged time
+            var startDate = new Date(getCookieValue("startTime"));
+            var tickDate = new Date(getCookieValue("tickTime"));
+            setCookie("time", Number(getCookieValue("time")) + getTimeDifference(startDate, tickDate));
         }
-    }
 
-    // Reset both tickTime and startTime to now after calculations have been completed
-    setCookie("startTime", Date());
-    setCookie("tickTime", Date());
+        // Page Load Check (Continuation)
+        if(getCookieValue("unloadTime") !== null && getCookieValue("unloadTime") !== "") {
+            var pageLoadTime = getTimeDifference(new Date(getCookieValue("unloadTime")), Date());
+            console.log("pageLoadTime: " + pageLoadTime);
+            if(pageLoadTime <= 10000) { // Only triggers if it has been less than 10 seconds
+                setCookie("time", Number(getCookieValue("time")) + pageLoadTime);
+                setCookie("unloadTime", null);
+            }
+        }
 
-    // Initiate the timer
-    setInterval(timeUpdate, 1000, inputLoginTimer);
-
-    // Update display immediately
-    timeUpdateDisplay(inputLoginTimer);
-}
-
-function timeUpdateDisplay(obj) {
-    // Existing + Unaccounted marked time
-    var milliseconds = (Number(getCookieValue("time")) + Number(getTimeDifference(getCookie("startTime"), getCookie("tickTime")))) / 1000;
-    var sec = Math.floor(milliseconds) % 60;
-    var min = Math.floor(milliseconds / 60) % 60;
-    var hr = Math.floor(milliseconds / 60 / 60);
-
-    obj.value = hr + "h " + min + "m " + sec + "s";
-    obj.title = milliseconds + "s";
-}
-
-function timeUpdate(obj) {
-    setCookie("tickTime", Date());
-    timeUpdateDisplay(obj);
-}
-
-function getTimeDifference(date1, date2) {
-    return new Date(date2).getTime() - new Date(date1).getTime();   
-}
-
-function timeReset() {
-    var res = confirm("Do you wish to reset the time?");
-    if(res === true) {
-        setCookie("time", "0");
+        // Reset both tickTime and startTime to now after calculations have been completed
         setCookie("startTime", Date());
         setCookie("tickTime", Date());
+
+        // Initiate the timer
+        setInterval(timeUpdate, 1000, inputLoginTimer);
+
+        // Update display immediately
+        timeUpdateDisplay(inputLoginTimer);
+    }
+
+    function timeUpdateDisplay(obj) {
+        // Existing + Unaccounted marked time
+        var milliseconds = (Number(getCookieValue("time")) + Number(getTimeDifference(getCookie("startTime"), getCookie("tickTime")))) / 1000;
+        var sec = Math.floor(milliseconds) % 60;
+        var min = Math.floor(milliseconds / 60) % 60;
+        var hr = Math.floor(milliseconds / 60 / 60);
+
+        obj.value = hr + "h " + min + "m " + sec + "s";
+        obj.title = milliseconds + "s";
+    }
+
+    function timeUpdate(obj) {
+        setCookie("tickTime", Date());
+        timeUpdateDisplay(obj);
+    }
+
+    function getTimeDifference(date1, date2) {
+        return new Date(date2).getTime() - new Date(date1).getTime();   
+    }
+
+    function timeReset() {
+        var res = confirm("Do you wish to reset the time?");
+        if(res === true) {
+            setCookie("time", "0");
+            setCookie("startTime", Date());
+            setCookie("tickTime", Date());
+        }
     }
 }
 
 // ==========================================================================================================
 // Auto-scroll Document
 // ==========================================================================================================
-// Container object
-var divAutoScroll = document.createElement("div");
-divAutoScroll.id = "autoScroll_div";
-divAutoScroll.style.color = "#FFF";
-divAutoScroll.style.position = "absolute";
-divAutoScroll.style.left = "25px";
-divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 82 + "px";
+if(GS_SETTINGS["AutoScroll"]["Enabled"]) {
+    // Container object
+    var divAutoScroll = document.createElement("div");
+    divAutoScroll.id = "autoScroll_div";
+    divAutoScroll.style.color = "#FFF";
+    divAutoScroll.style.position = "absolute";
+    divAutoScroll.style.left = "25px";
+    divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 82 + "px";
 
-// Label
-var lblAutoScroll = document.createElement("label");
-lblAutoScroll.id="autoScroll_lbl";
-lblAutoScroll.htmlFor="autoScroll_chk";
-lblAutoScroll.innerHTML="Auto-Scroll";
+    // Label
+    var lblAutoScroll = document.createElement("label");
+    lblAutoScroll.id="autoScroll_lbl";
+    lblAutoScroll.htmlFor="autoScroll_chk";
+    lblAutoScroll.innerHTML="Auto-Scroll";
 
-// Checkbox
-var chkAutoScroll = document.createElement("input");
-chkAutoScroll.type = "checkbox";
-chkAutoScroll.id = "autoScroll_chk";
-chkAutoScroll.onchange = updateAutoScrollSetting;
-chkAutoScroll.checked = Boolean(getCookieValueDef("autoScroll", "").replace("false", ""));
+    // Checkbox
+    var chkAutoScroll = document.createElement("input");
+    chkAutoScroll.type = "checkbox";
+    chkAutoScroll.id = "autoScroll_chk";
+    chkAutoScroll.onchange = updateAutoScrollSetting;
+    chkAutoScroll.checked = Boolean(getCookieValueDef("autoScroll", "").replace("false", ""));
 
-divAutoScroll.appendChild(chkAutoScroll);
-divAutoScroll.appendChild(lblAutoScroll);
+    divAutoScroll.appendChild(chkAutoScroll);
+    divAutoScroll.appendChild(lblAutoScroll);
 
-document.body.appendChild(divAutoScroll);
+    document.body.appendChild(divAutoScroll);
 
-setInterval(scrollDocument, SCROLL_SPEED);
+    var scrollTimer = setInterval(scrollDocument, GS_SETTINGS["AutoScroll"]["ScrollSpeed"]);
 
-function scrollDocument() {
-    if(document.getElementById("autoScroll_chk").checked) {
-        document.getElementById("imageWrapper").scrollTop += SCROLL_AMOUNT;
+    function scrollDocument() {
+        if(document.getElementById("autoScroll_chk").checked) {
+            document.getElementById("imageWrapper").scrollTop += GS_SETTINGS["AutoScroll"]["ScrollAmount"];
+        }
     }
-}
 
-function updateAutoScrollSetting() {
-    console.log("autoScroll = " + document.getElementById("autoScroll_chk").checked);
-    setCookie("autoScroll", document.getElementById("autoScroll_chk").checked);
+    function updateAutoScrollSetting() {
+        console.log("autoScroll = " + document.getElementById("autoScroll_chk").checked);
+        setCookie("autoScroll", document.getElementById("autoScroll_chk").checked);
+    }
 }
 
 // timer & auto-scroll div location reset on resize
@@ -289,29 +321,36 @@ window.addEventListener("resize", function(e) {
 });
 
 // ==========================================================================================================
-// Digit Prefix
+// Digit Prediction
 // ==========================================================================================================
-document.getElementsByClassName("container-fluid")[0].addEventListener("DOMSubtreeModified", prefixTextfield);
-// Trigger function once on page loads, requires srcElement.id=imageWrapper
-prefixTextfield({srcElement:{id:"imageWrapper"}});
+if(GS_SETTINGS["DigitPrediction"]["Enabled"]) {
+    document.getElementsByClassName("container-fluid")[0].addEventListener("DOMSubtreeModified", prefixTextfield);
+    // Trigger function once on page loads, requires srcElement.id=imageWrapper
+    prefixTextfield({srcElement:{id:"imageWrapper"}});
 
-function prefixTextfield(e) {
-    console.log(e);
-    if(e.srcElement.id == "imageWrapper") {
-        var input = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument");
-        var count = 0;
-        for(var i =0; i < input.value.length; i++) {
-            if(input.value.charAt(i) == "_") {
-                count++;
+    function prefixTextfield(e) {
+        // console.log(e);
+        if(e.srcElement.id == "imageWrapper") {
+            var input = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument");
+            var count = 0;
+            for(var i =0; i < input.value.length; i++) {
+                if(input.value.charAt(i) == "_") {
+                    count++;
+                }
             }
+
+            // console.log("0".repeat(count) + input.value);
+            var res = Number(input.value.replace(/_/g, ""));
+
+            // Predictability
+            var numModifier = 0;
+            var lastPageNumber = "";
+            do {
+                lastPageNumber = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadGridDocuments_ctl00").children[2].children[0].children[1 + numModifier].innerHTML;
+                if(lastPageNumber == "&nbsp;") { numModifier++; }
+            } while(lastPageNumber == "&nbsp;");
+            input.value = "0".repeat(count) + (res + Number(lastPageNumber) + numModifier - 1);
         }
-
-        // console.log("0".repeat(count) + input.value);
-        var res = Number(input.value.replace(/_/g, ""));
-
-        // Predictability
-        var lastPageNumber = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadGridDocuments_ctl00").children[2].children[0].children[1].innerHTML;
-        input.value = "0".repeat(count) + (res + Number(lastPageNumber) - 1);
     }
 }
 
