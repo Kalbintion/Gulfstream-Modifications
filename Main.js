@@ -2,7 +2,7 @@
 // @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Main.js
 // @name         Gulf Stream Modifications
 // @namespace    https://gulfstream.fidlar.com
-// @version      0.17
+// @version      0.18
 // @description  Modifies the Gulfstream website in various ways to provide a better user interface
 // @author       Kalbintion
 // @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream*
@@ -23,8 +23,8 @@ var GS_SETTINGS = {
         
         // For Keycodes see http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
         // Use -1 to disable
-        PrevDocument: -1, // Goes to the previous document
-        NextDocument: -1, // Goes to the next document
+        PrevDocument: 37, // Goes to the previous document
+        NextDocument: 39, // Goes to the next document
         AddPage: 107, // Adds page to document
         NextDocumentFocus: -1,  // Focuses input onto Document name textbox
         PageNumberFocus: -1, // Focuses input onto page number textbox
@@ -62,6 +62,10 @@ var GS_SETTINGS = {
     },
 // MODULE: Digit Prediction
     DigitPrediction: { // This module predicts the next page document number and prefixes the name with zero's
+        Enabled: true,
+    },
+// MODULE: Images Left
+    ImagesLeft: { // This module modifies the "Complete" field in the top left of the page to indicate how many are left
         Enabled: true,
     },
 };
@@ -277,7 +281,7 @@ if(GS_SETTINGS.LoginTimer.Enabled) {
 // ==========================================================================================================
 // Auto-scroll Document
 // ==========================================================================================================
-if(GS_SETTINGS["AutoScroll"]["Enabled"]) {
+if(GS_SETTINGS.AutoScroll.Enabled) {
     // Container object
     var divAutoScroll = document.createElement("div");
     divAutoScroll.id = "autoScroll_div";
@@ -321,7 +325,7 @@ if(GS_SETTINGS["AutoScroll"]["Enabled"]) {
 // ==========================================================================================================
 // Alternate Scroll
 // ==========================================================================================================
-if(GS_SETTINGS["AlternateScroll"]["Enabled"]) {
+if(GS_SETTINGS.AlternateScroll.Enabled) {
     var alternateScrollTimer;
     var alreadyCreated = false;
     alternateScroll({srcElement:{innerHTML:"id=\"imageWrapper\""}});
@@ -355,15 +359,13 @@ if(GS_SETTINGS["AlternateScroll"]["Enabled"]) {
             clearInterval(alternateScrollTimer);
             alreadyCreated = false;
         }
-        
-        // console.log(document.getElementById("imageWrapper").scrollLeft + ", " + document.getElementById("imageWrapper").scrollWidth);
     }
 }
 
 // ==========================================================================================================
 // Digit Prediction
 // ==========================================================================================================
-if(GS_SETTINGS["DigitPrediction"]["Enabled"]) {
+if(GS_SETTINGS.DigitPrediction.Enabled) {
     
     // Trigger function once on page loads, requires srcElement.id=imageWrapper
     prefixTextfield({srcElement:{id:"imageWrapper"}});
@@ -411,6 +413,23 @@ if(GS_SETTINGS["DigitPrediction"]["Enabled"]) {
 }
 
 // ==========================================================================================================
+// Images Left To Do
+// ==========================================================================================================
+if(GS_SETTINGS.ImagesLeft.Enabled) {
+    updateDocumentsLeft({srcElement:{id:"ctl00_ctl00_MainContent_ctl00_ctl00_MainContent_RadAjaxPanel1Panel"}});
+    
+    function updateDocumentsLeft(e) {
+        if(e.srcElement.id == "ctl00_ctl00_MainContent_ctl00_ctl00_MainContent_RadAjaxPanel1Panel") {
+            var completeInfo = document.getElementById("MainContent_DefaultMainContent_ProjectCompleteLabel");
+            var info = completeInfo.innerHTML.split("/");
+            
+            var difference = Number(info[1]) - Number(info[0])
+            completeInfo.innerHTML = info[0] + "/" + info[1] + " (" + difference + " left)";
+        }
+    }
+}
+
+// ==========================================================================================================
 // Cookie Functions
 // ==========================================================================================================
 function getCookie(name) { return getCookieValue(name); }
@@ -441,7 +460,7 @@ function setCookie(name, value) {
 window.addEventListener("resize", function(e) {
     var topOffset = 22;
     if(GS_SETTINGS.LoginTimer.Enabled) { divLoginTimer.style.top = document.getElementsByTagName("nav")[0].offsetHeight + topOffset + "px"; topOffset += 60; }
-    if(GS_SETTINGS.AutoScroll.Enabled) { divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + topOFfset + "px"; topOFfset += 60; }
+    if(GS_SETTINGS.AutoScroll.Enabled) { divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + topOffset + "px"; topOffset += 60; }
 });
 
 // TODO: Look into how MutationObserver works in more detail, as this wasn't firing off events at all regardless of the config settings saying "FIRE ON EVERYTHING!"
@@ -454,4 +473,5 @@ document.getElementsByClassName("container-fluid")[0].addEventListener("DOMSubtr
 function domEventListener(e) {
     if(GS_SETTINGS.DigitPrediction.Enabled) { prefixTextfield(e); }
     if(GS_SETTINGS.AlternateScroll.Enabled) { alternateScroll(e); }
+    if(GS_SETTINGS.ImagesLeft.Enabled) { updateDocumentsLeft(e); }
 }
