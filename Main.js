@@ -2,11 +2,12 @@
 // @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Main.js
 // @name         Gulf Stream Modifications
 // @namespace    https://gulfstream.fidlar.com
-// @version      0.16
+// @version      0.17
 // @description  Modifies the Gulfstream website in various ways to provide a better user interface
 // @author       Kalbintion
 // @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream*
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
 // @icon         https://gulfstream.fidlar.com/Content/Images/favicon.ico
 // @icon64       https://gulfstream.fidlar.com/Content/Images/favicon.ico
 // ==/UserScript==
@@ -22,8 +23,8 @@ var GS_SETTINGS = {
         
         // For Keycodes see http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
         // Use -1 to disable
-        PrevDocument: 37, // Goes to the previous document
-        NextDocument: 39, // Goes to the next document
+        PrevDocument: -1, // Goes to the previous document
+        NextDocument: -1, // Goes to the next document
         AddPage: 107, // Adds page to document
         NextDocumentFocus: -1,  // Focuses input onto Document name textbox
         PageNumberFocus: -1, // Focuses input onto page number textbox
@@ -51,17 +52,17 @@ var GS_SETTINGS = {
     },
 // MODULE: Alternate Scroll
     AlternateScroll: { // This module will alternate the document area to the opposite side of every other document page
-        Enabled:true,
+        Enabled:false,
         
         OddOrEven:"odd", // Whether to alternate the side the document is on on odd or even based page numbers
     },
 // MODULE: Modify Image Source
     ImageSourceMods: {// This module tries to modify the image on the screen to its original
-        Enabled: false,
+        Enabled: true,
     },
 // MODULE: Digit Prediction
     DigitPrediction: { // This module predicts the next page document number and prefixes the name with zero's
-        Enabled: false,
+        Enabled: true,
     },
 };
 
@@ -75,50 +76,53 @@ if (GS_SETTINGS["ShortcutKeys"]["Enabled"]) {
         var code = e.keyCode;
         switch ( code )
         {
-            case GS_SETTINGS["ShortcutKeys"]["PrevDocument"]:
+            case GS_SETTINGS.ShortcutKeys.PrevDocument:
                 document.getElementById("MainContent_DefaultMainContent_lbLastDocument").click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["NextDocument"]:
+            case GS_SETTINGS.ShortcutKeys.NextDocument:
                 document.getElementById("MainContent_DefaultMainContent_lbNextDocument").click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["AddPage"]:
+            case GS_SETTINGS.ShortcutKeys.AddPage:
                 document.getElementById("MainContent_DefaultMainContent_RadButtonAddPage").click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["NextDocumentFocus"]:
+            case GS_SETTINGS.ShortcutKeys.NextDocumentFocus:
                 document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument").focus();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["PageNumberFocus"]:
+            case GS_SETTINGS.ShortcutKeys.PageNumberFocus:
                 document.getElementById("MainContent_DefaultMainContent_CurrentPageNumber").focus();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["RenameYes"]:
+            case GS_SETTINGS.ShortcutKeys.RenameYes:
                 document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonYes").click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["RenameNo"]:
+            case GS_SETTINGS.ShortcutKeys.RenameNo:
                 document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowRenameDocument_C_RadButtonNo").click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["MultiDoc"]:
+            case GS_SETTINGS.ShortcutKeys.MultiDoc:
                 document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.lastChild.click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["BlankPage"]:
+            case GS_SETTINGS.ShortcutKeys.BlankPage:
                 document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[2].click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["Undo"]:
+            case GS_SETTINGS.ShortcutKeys.Undo:
                 document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[0].click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["Redo"]:
+            case GS_SETTINGS.ShortcutKeys.Redo:
                 document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[1].click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["RotateCCW"]:
+            case GS_SETTINGS.ShortcutKeys.RotateCCW:
                 document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[0].click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["RotateCW"]:
+            case GS_SETTINGS.ShortcutKeys.RotateCW:
                 document.getElementsByClassName("darkroom-toolbar-actions")[0].children[1].children[1].click();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["AutoScroll"]:
+            case GS_SETTINGS.ShortcutKeys.AutoScroll:
                 document.getElementById("autoScroll_chk").checked = !document.getElementById("autoScroll_chk").checked;
                 updateAutoScrollSetting();
                 break;
-            case GS_SETTINGS["ShortcutKeys"]["BlankPage"]:
+            case GS_SETTINGS.ShortcutKeys.BlankPage:
+                document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[2].click();
+                break;
+            case GS_SETTINGS.ShortcutKeys.DupePage:
                 document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[1].click();
                 break;
             default:
@@ -167,7 +171,7 @@ function ModifyMultidoc() {
 // ==========================================================================================================
 // Time Tracking System
 // ==========================================================================================================
-if(GS_SETTINGS["LoginTimer"]["Enabled"]) {
+if(GS_SETTINGS.LoginTimer.Enabled) {
     // Login Timer Div
     var divLoginTimer = document.createElement("div");
     divLoginTimer.id = "loginTimer_div";
@@ -314,26 +318,68 @@ if(GS_SETTINGS["AutoScroll"]["Enabled"]) {
     }
 }
 
-// timer & auto-scroll div location reset on resize
-window.addEventListener("resize", function(e) {
-    divLoginTimer.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 22 + "px";
-    divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + 82 + "px";
-});
+// ==========================================================================================================
+// Alternate Scroll
+// ==========================================================================================================
+if(GS_SETTINGS["AlternateScroll"]["Enabled"]) {
+    var alternateScrollTimer;
+    var alreadyCreated = false;
+    alternateScroll({srcElement:{innerHTML:"id=\"imageWrapper\""}});
+    
+    function alternateScroll(e) {
+        if(e.srcElement.innerHTML.indexOf("id=\"imageWrapper\"") >= 0 && alreadyCreated === false) {
+            console.log("Creating timer from:");
+            console.log(e);
+            alternateScrollTimer = setInterval(alternateScrollDocument, 10);
+            alreadyCreated = true;
+        }
+    }
+    
+    function alternateScrollDocument() {
+        var completeInfo = document.getElementById("MainContent_DefaultMainContent_ProjectCompleteLabel");
+        var curPageNumber = Number(completeInfo.innerHTML.split("/")[0])+1;
+        var isOddOrEven = curPageNumber%2; // 0 = even, 1 = odd
+        if(GS_SETTINGS.AlternateScroll.OddOrEven == "odd" && isOddOrEven === 1) {
+            document.getElementById("imageWrapper").scrollLeft = document.getElementById("imageWrapper").scrollWidth;
+            if(document.getElementById("imageWrapper").scrollLeft >= 50) {
+                clearInterval(alternateScrollTimer);
+                alreadyCreated = false;
+            }
+        } else if(GS_SETTINGS.AlternateScroll.OddOrEven == "even" && isOddOrEven === 0) {
+            document.getElementById("imageWrapper").scrollLeft = document.getElementById("imageWrapper").scrollWidth;
+            if(document.getElementById("imageWrapper").scrollLeft >= 50) {
+                clearInterval(alternateScrollTimer);
+                alreadyCreated = false;
+            }
+        } else {
+            clearInterval(alternateScrollTimer);
+            alreadyCreated = false;
+        }
+        
+        // console.log(document.getElementById("imageWrapper").scrollLeft + ", " + document.getElementById("imageWrapper").scrollWidth);
+    }
+}
 
 // ==========================================================================================================
 // Digit Prediction
 // ==========================================================================================================
 if(GS_SETTINGS["DigitPrediction"]["Enabled"]) {
-    document.getElementsByClassName("container-fluid")[0].addEventListener("DOMSubtreeModified", prefixTextfield);
+    
     // Trigger function once on page loads, requires srcElement.id=imageWrapper
     prefixTextfield({srcElement:{id:"imageWrapper"}});
 
     function prefixTextfield(e) {
         // console.log(e);
         if(e.srcElement.id == "imageWrapper") {
+            var instructionsInfo = document.getElementById("MainContent_DefaultMainContent_NotesLabel");
+            var isLetterSuffixed = (document.getElementById("MainContent_DefaultMainContent_NotesLabel").title.indexOf("A)") >= 0 || document.getElementById("MainContent_DefaultMainContent_NotesLabel").title.indexOf("B)") >= 0);
+            
+            
             var input = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument");
+            var nameLength = input.value.length;
+            
             var count = 0;
-            for(var i =0; i < input.value.length; i++) {
+            for(var i = 0; i < input.value.length; i++) {
                 if(input.value.charAt(i) == "_") {
                     count++;
                 }
@@ -346,10 +392,20 @@ if(GS_SETTINGS["DigitPrediction"]["Enabled"]) {
             var numModifier = 0;
             var lastPageNumber = "";
             do {
-                lastPageNumber = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadGridDocuments_ctl00").children[2].children[0].children[1 + numModifier].innerHTML;
+                var pageInfo;
+                do {
+                    pageInfo = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadGridDocuments").children[1].children[0].children[2].children[numModifier].children[1];
+                } while(pageInfo === null);
+                lastPageNumber = pageInfo.innerHTML;
                 if(lastPageNumber == "&nbsp;") { numModifier++; }
             } while(lastPageNumber == "&nbsp;");
-            input.value = "0".repeat(count) + (res + Number(lastPageNumber) + numModifier - 1);
+            
+            // Set the value
+            if(isLetterSuffixed) {
+                input.value = "0".repeat(count - 1) + (res + Number(lastPageNumber) + numModifier - 1);
+            } else {
+                input.value = "0".repeat(count) + (res + Number(lastPageNumber) + numModifier - 1);
+            }
         }
     }
 }
@@ -376,4 +432,26 @@ function getCookieValueDef(name, defaultValue) {
 
 function setCookie(name, value) {
     document.cookie=name + "=" + value;
+}
+
+// ==========================================================================================================
+// Misc Functions & Events
+// ==========================================================================================================
+// timer & auto-scroll div location reset on resize
+window.addEventListener("resize", function(e) {
+    var topOffset = 22;
+    if(GS_SETTINGS.LoginTimer.Enabled) { divLoginTimer.style.top = document.getElementsByTagName("nav")[0].offsetHeight + topOffset + "px"; topOffset += 60; }
+    if(GS_SETTINGS.AutoScroll.Enabled) { divAutoScroll.style.top = document.getElementsByTagName("nav")[0].offsetHeight + topOFfset + "px"; topOFfset += 60; }
+});
+
+// TODO: Look into how MutationObserver works in more detail, as this wasn't firing off events at all regardless of the config settings saying "FIRE ON EVERYTHING!"
+/* var observer = new MutationObserver(domEventListener);
+var config = {childList: true, attributes: true, characterData: true};
+observer.observe(document.getElementsByClassName("container-fluid")[0], config); */
+
+document.getElementsByClassName("container-fluid")[0].addEventListener("DOMSubtreeModified", domEventListener);
+
+function domEventListener(e) {
+    if(GS_SETTINGS.DigitPrediction.Enabled) { prefixTextfield(e); }
+    if(GS_SETTINGS.AlternateScroll.Enabled) { alternateScroll(e); }
 }
