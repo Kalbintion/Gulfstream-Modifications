@@ -2,7 +2,7 @@
 // @updateURL    https://raw.githubusercontent.com/Kalbintion/Gulfstream-Modifications/master/Main.js
 // @name         Gulf Stream Modifications
 // @namespace    https://gulfstream.fidlar.com
-// @version      0.18
+// @version      0.19
 // @description  Modifies the Gulfstream website in various ways to provide a better user interface
 // @author       Kalbintion
 // @include		 https://gulfstream.fidlar.com/Views/GulfStream/GulfStream*
@@ -19,8 +19,8 @@
 var GS_SETTINGS = {
 // MODULE: Shortcut Keys
     ShortcutKeys: { // This module adds custom shortcut keys to the system.
-        Enabled: true, 
-        
+        Enabled: true,
+
         // For Keycodes see http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
         // Use -1 to disable
         PrevDocument: 37, // Goes to the previous document
@@ -32,6 +32,7 @@ var GS_SETTINGS = {
         RenameNo: -1, // "No" on the rename dialog
         MultiDoc: 106, // Brings up the multiple document window
         BlankPage: 111, // Marks page as blank
+        OutOfOrder: -1, // Out of order special condition
         Undo: -1, // Undo button (black toolbar, <)
         Redo: -1, // Redo button (black toolbar, >)
         RotateCCW: -1, // Counter-clockwise rotate (black toolbar, < circle)
@@ -46,14 +47,14 @@ var GS_SETTINGS = {
 // MODULE: Auto-Scroll
     AutoScroll: { // This module adds a checkbox to automatically scroll the document window
         Enabled:true,
-        
+
         ScrollSpeed:10,
         ScrollAmount:6,
     },
 // MODULE: Alternate Scroll
     AlternateScroll: { // This module will alternate the document area to the opposite side of every other document page
         Enabled:false,
-        
+
         OddOrEven:"odd", // Whether to alternate the side the document is on on odd or even based page numbers
     },
 // MODULE: Modify Image Source
@@ -63,6 +64,13 @@ var GS_SETTINGS = {
 // MODULE: Digit Prediction
     DigitPrediction: { // This module predicts the next page document number and prefixes the name with zero's
         Enabled: true,
+
+// TODO: Finish Module
+// NOTE: Do not enable this module unless you are certain you want to. Suffers from an issue.
+// MODULE: Digit Prediction - MultiDoc
+        MultiDoc: { // This sub-module predicts the next page document number for the multi-doc system
+            Enabled: false,
+        },
     },
 // MODULE: Images Left
     ImagesLeft: { // This module modifies the "Complete" field in the top left of the page to indicate how many are left
@@ -73,7 +81,7 @@ var GS_SETTINGS = {
 // ==========================================================================================================
 // Key Shortcuts
 // ==========================================================================================================
-if (GS_SETTINGS["ShortcutKeys"]["Enabled"]) {
+if (GS_SETTINGS.ShortcutKeys.Enabled) {
     document.body.addEventListener("keydown", keyDownTextField, false);
     function keyDownTextField(e) {
         // console.log(e.keyCode);
@@ -107,6 +115,9 @@ if (GS_SETTINGS["ShortcutKeys"]["Enabled"]) {
             case GS_SETTINGS.ShortcutKeys.BlankPage:
                 document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[2].click();
                 break;
+            case GS_SETTINGS.ShortcutKeys.OutOfOrder:
+                document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_Arrow").click();document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadComboBoxSpecialCondition_DropDown").lastChild.lastChild.children[3].click();
+                break;
             case GS_SETTINGS.ShortcutKeys.Undo:
                 document.getElementsByClassName("darkroom-toolbar-actions")[0].children[0].children[0].click();
                 break;
@@ -138,7 +149,7 @@ if (GS_SETTINGS["ShortcutKeys"]["Enabled"]) {
 // ==========================================================================================================
 // Modifies the image link to show original image
 // ==========================================================================================================
-if(GS_SETTINGS["ImageSourceMods"]["Enabled"]) {
+if(GS_SETTINGS.ImageSourceMods.Enabled) {
     var imageLinkTimer = setInterval(ModifyImageLink, 250);
 
     function ModifyImageLink() {
@@ -308,11 +319,11 @@ if(GS_SETTINGS.AutoScroll.Enabled) {
 
     document.body.appendChild(divAutoScroll);
 
-    var scrollTimer = setInterval(scrollDocument, GS_SETTINGS["AutoScroll"]["ScrollSpeed"]);
+    var scrollTimer = setInterval(scrollDocument, GS_SETTINGS.AutoScroll.ScrollSpeed);
 
     function scrollDocument() {
         if(document.getElementById("autoScroll_chk").checked) {
-            document.getElementById("imageWrapper").scrollTop += GS_SETTINGS["AutoScroll"]["ScrollAmount"];
+            document.getElementById("imageWrapper").scrollTop += GS_SETTINGS.AutoScroll.ScrollAmount;
         }
     }
 
@@ -366,7 +377,7 @@ if(GS_SETTINGS.AlternateScroll.Enabled) {
 // Digit Prediction
 // ==========================================================================================================
 if(GS_SETTINGS.DigitPrediction.Enabled) {
-    
+
     // Trigger function once on page loads, requires srcElement.id=imageWrapper
     prefixTextfield({srcElement:{id:"imageWrapper"}});
 
@@ -375,11 +386,13 @@ if(GS_SETTINGS.DigitPrediction.Enabled) {
         if(e.srcElement.id == "imageWrapper") {
             var instructionsInfo = document.getElementById("MainContent_DefaultMainContent_NotesLabel");
             var isLetterSuffixed = (document.getElementById("MainContent_DefaultMainContent_NotesLabel").title.indexOf("A)") >= 0 || document.getElementById("MainContent_DefaultMainContent_NotesLabel").title.indexOf("B)") >= 0);
-            
-            
+
+
             var input = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument");
+            // {"enabled":true,"emptyMessage":"","validationText":"141","valueAsString":"141_","valueWithPromptAndLiterals":"141_","lastSetTextBoxValue":"141_"}
+            var inputOther = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument_ClientState");
             var nameLength = input.value.length;
-            
+
             var count = 0;
             for(var i = 0; i < input.value.length; i++) {
                 if(input.value.charAt(i) == "_") {
@@ -401,13 +414,100 @@ if(GS_SETTINGS.DigitPrediction.Enabled) {
                 lastPageNumber = pageInfo.innerHTML;
                 if(lastPageNumber == "&nbsp;") { numModifier++; }
             } while(lastPageNumber == "&nbsp;");
-            
-            // Set the value
-            if(isLetterSuffixed) {
-                input.value = "0".repeat(count - 1) + (res + Number(lastPageNumber) + numModifier - 1);
-            } else {
-                input.value = "0".repeat(count) + (res + Number(lastPageNumber) + numModifier - 1);
+
+
+            // We need to kill off the existing textboxes there
+            var wrapperNode = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument_wrapper");
+            while (wrapperNode.lastChild) {
+                wrapperNode.removeChild(wrapperNode.lastChild);
             }
+
+            var newInputNode = document.createElement("input");
+            newInputNode.id = "ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument";
+            newInputNode.name = "ctl00$ctl00$MainContent$DefaultMainContent$TextBoxNextDocument";
+            newInputNode.type = "text";
+            newInputNode.size = "20";
+            newInputNode.setAttribute("class", "riTextBox riEnabled");
+            newInputNode.style = "font-size: 14pt;";
+
+            var newInputNodeClient = document.createElement("input");
+            newInputNodeClient.id = "ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument_ClientState";
+            newInputNodeClient.name = "ctl00_ctl00_MainContent_DefaultMainContent_TextBoxNextDocument_ClientState";
+            newInputNodeClient.type = "hidden";
+            newInputNodeClient.autocomplete = "false";
+
+            // Set the value
+            var docName;
+            if(isLetterSuffixed && count > 0) {
+                docName = "0".repeat(count - 1) + (res + Number(lastPageNumber) + numModifier - 1);
+                newInputNode.value = docName;
+                newInputNodeClient.value = '{"enabled":true,"emptyMessage":"","validationText":"' + docName + '","valueAsString":"' + docName + '","valueWithPromptAndLiterals":"' + docName + '","lastSetTextBoxValue":"' + docName + '"}';
+            } else {
+                docName = "0".repeat(count) + (res + Number(lastPageNumber) + numModifier - 1);
+                newInputNode.value = docName;
+                newInputNodeClient.value = '{"enabled":true,"emptyMessage":"","validationText":"' + docName + '","valueAsString":"' + docName + '","valueWithPromptAndLiterals":"' + docName + '","lastSetTextBoxValue":"' + docName + '"}';
+            }
+
+            // Re-add the child elements
+            wrapperNode.appendChild(newInputNode);
+            wrapperNode.appendChild(newInputNodeClient);
+        }
+    }
+}
+
+if(GS_SETTINGS.DigitPrediction.Enabled && GS_SETTINGS.DigitPrediction.MultiDoc.Enabled) {
+    attachMultiDocHandlers(null);
+
+    function attachMultiDocHandlers(e) {
+        var multiDocWindow = document.getElementById("RadWindowWrapper_ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages");
+        if(multiDocWindow !== null) {
+            multiDocWindow.addEventListener('focus',multiPrefixTextField,true);
+        }
+    }
+
+    function multiPrefixTextField(e) {
+        if(e !== null && e !== undefined) {
+            var focusedElement = e.srcElement;
+            var focusedElementId = focusedElement.id;
+            var multiIdNumber = Number(focusedElementId.substring(focusedElementId.length - 2).replace("e", ""))
+            if(multiIdNumber > 1 && focusedElementId.indexOf("Name") >= 0) { // Lets not deal with the Page fields
+
+                // ## - is the identification number for the particular multi-doc entry
+                // Multi-doc Item ID Format: ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C_TextBoxDocumentName##
+                //                           ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C_TextBoxDocumentPage##
+                var previousMultiElementName = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C_TextBoxDocumentName" + (multiIdNumber - 1));
+                var previousMultiElementPage = document.getElementById("ctl00_ctl00_MainContent_DefaultMainContent_RadWindowMultipleImages_C_TextBoxDocumentPage" + (multiIdNumber - 1));
+
+                var previousName = previousMultiElementName.value.replace("_", "");
+                var previousPage = previousMultiElementPage.value;
+                var previousNameLetter = "";
+
+                // Numbers are Code values 48-57
+                if(previousName.substring(previousName.length - 1).charCodeAt(0) >= 65) {
+                    // Last bit of name is a letter [A-Z]
+                    previousNameLetter = previousName.substring(previousName.length -1); // Store last letter
+                    previousName = previousName.substring(0, previousName.length-1); // Trim off last character
+                }
+
+                console.log("Previous Name: " + previousName);
+                console.log("Previous Name Letter: " + previousNameLetter);
+
+                console.log(previousNameLetter != "");
+
+                if(previousNameLetter != "" && multiIdNumber - 1 == 1) {
+                    // We are dealing with the second multi-doc textbox, we need to deal with this case in a special way
+                    // As this can be a document that is further along, a combo of prev doc name + page number
+                    console.log(previousName + ", " + previousPage);
+                    focusedElement.value = Number(previousName) + Number(previousPage); // No check necessary on previousPage value, empty string gives value 0 from Number()
+                } else {
+                    // Otherwise, we'll go with adding the previous one
+                    if(previousNameLetter = "") { previousNameLetter = String.fromCharCode(64); } // We'll cause this to be one character below "A"
+
+                    previousNameLetter = String.fromCharCode(previousNameLetter.charCodeAt(0)+1);
+                    focusedElement.value = previousName + previousNameLetter;
+                }
+            }
+
         }
     }
 }
@@ -421,6 +521,7 @@ if(GS_SETTINGS.ImagesLeft.Enabled) {
     function updateDocumentsLeft(e) {
         if(e.srcElement.id == "ctl00_ctl00_MainContent_ctl00_ctl00_MainContent_RadAjaxPanel1Panel") {
             var completeInfo = document.getElementById("MainContent_DefaultMainContent_ProjectCompleteLabel");
+            if(completeInfo === null) { return; }
             var info = completeInfo.innerHTML.split("/");
             
             var difference = Number(info[1]) - Number(info[0])
@@ -474,4 +575,10 @@ function domEventListener(e) {
     if(GS_SETTINGS.DigitPrediction.Enabled) { prefixTextfield(e); }
     if(GS_SETTINGS.AlternateScroll.Enabled) { alternateScroll(e); }
     if(GS_SETTINGS.ImagesLeft.Enabled) { updateDocumentsLeft(e); }
+    if(GS_SETTINGS.DigitPrediction.Enabled && GS_SETTINGS.DigitPrediction.MultiDoc.Enabled) { attachMultiDocHandlers(e); }
+}
+
+// Toolbox creation (settings for this script w/o modifying code)
+while(typeof $ != "function") {
+    
 }
